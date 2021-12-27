@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class RobotScript : MonoBehaviour
 {
-
+    
     private GameObject joint1;
     private GameObject joint2;
     private GameObject joint3;
@@ -15,6 +15,13 @@ public class RobotScript : MonoBehaviour
     private articulationRotoideScript jointScript3;
     private articulationPrismaticScript jointScript4;
     private articulationRotoideScript jointScript5;
+
+    private bool drawLine;
+    private bool drawCircle;
+    private bool drawEnsisa;
+    private float xDesired;
+    private float yDesired;
+    private float zDesired;
 
 
     [System.Serializable]
@@ -54,6 +61,9 @@ public class RobotScript : MonoBehaviour
         jointScript3 = joint3.GetComponent<articulationRotoideScript>();
         jointScript4 = joint4.GetComponent<articulationPrismaticScript>();
         jointScript5 = joint5.GetComponent<articulationRotoideScript>();
+        drawLine = false;
+        drawCircle = false;
+        drawEnsisa = false;
     }
 
     // Update is called once per frame
@@ -79,5 +89,148 @@ public class RobotScript : MonoBehaviour
         {
             jointScript5.angle = jointsPositions.positionRotoide3;
         }
+
+        if (drawLine)
+        {
+            if(xDesired < 10)
+            {
+                xDesired += 0.1f;
+                float[] Variables = CalculVariablesArticulaires(xDesired, yDesired, zDesired);
+                // [jointScript1.angle, jointScript2.distance, jointScript3.angle, jointScript4.distance, jointScript5.angle]
+                jointScript1.angle = Variables[0];
+                jointScript2.distance = Variables[1];
+                jointScript3.angle = Variables[2];
+                jointScript4.distance = Variables[3];
+                jointScript5.angle = Variables[4];
+                jointsPositions.positionRotoide1 = Variables[0];
+                jointsPositions.positionPrismatic1 = Variables[1];
+                jointsPositions.positionRotoide2 = Variables[2];
+                jointsPositions.positionPrismatic2 = Variables[3];
+                jointsPositions.positionRotoide3 = Variables[4];
+            }
+            else
+            {
+                drawLine = false;
+                EndDraw();
+            }
+        }
+    }
+
+    public void DrawLine()
+    {
+        StartDrawLine();
+        Invoke("inPositionToDrawLine", 2);
+    }
+    public void DrawCircle()
+    {
+        StartDrawCircle();
+        Invoke("inPositionToDrawCircle", 2);
+    }
+    public void DrawEnsisa()
+    {
+        StartDrawEnsisa();
+        Invoke("inPositionToDrawEnsisa", 2);
+    }
+
+
+
+    void inPositionToDrawLine()
+    {
+        drawLine = true;
+    }
+    void inPositionToDrawCircle()
+    {
+        drawCircle = true;
+    }
+    void inPositionToDrawEnsisa()
+    {
+        drawEnsisa = true;
+    }
+
+    void StartDrawLine()
+    {
+        // ici on met CalculVariablesArticulaires(xDesired, yDesired, zDesired)
+        xDesired = -6.5f;
+        yDesired = 10.3f;
+        zDesired = -22.3f;
+        jointsPositions.positionRotoide1 = 100;
+        jointsPositions.positionPrismatic1 = 5;
+        jointsPositions.positionRotoide2 = 6;
+        jointsPositions.positionPrismatic2 = 5;
+        jointsPositions.positionRotoide3 = 20;
+    }
+    void StartDrawCircle()
+    {
+        // ici on met CalculVariablesArticulaires(xDesired, yDesired, zDesired)
+        xDesired = -6.5f;
+        yDesired = 10.3f;
+        zDesired = -22.3f;
+        jointsPositions.positionRotoide1 = 100;
+        jointsPositions.positionPrismatic1 = 5;
+        jointsPositions.positionRotoide2 = 6;
+        jointsPositions.positionPrismatic2 = 5;
+        jointsPositions.positionRotoide3 = 20;
+    }
+    void StartDrawEnsisa()
+    {
+        // ici on met CalculVariablesArticulaires(xDesired, yDesired, zDesired)
+        xDesired = -6.5f;
+        yDesired = 10.3f;
+        zDesired = -22.3f;
+        jointsPositions.positionRotoide1 = 100;
+        jointsPositions.positionPrismatic1 = 5;
+        jointsPositions.positionRotoide2 = 6;
+        jointsPositions.positionPrismatic2 = 5;
+        jointsPositions.positionRotoide3 = 20;
+    }
+    void EndDraw()
+    {
+        jointsPositions.positionRotoide1 = 0;
+        jointsPositions.positionPrismatic1 = 0;
+        jointsPositions.positionRotoide2 = 0;
+        jointsPositions.positionPrismatic2 = 0;
+        jointsPositions.positionRotoide3 = 0;
+    }
+
+
+
+    float[] CalculVariablesArticulaires(float x, float y, float z)
+    {
+
+        // matrice de modele geometrique inverse
+        float[] Variables = new float[5];
+        Variables[0] = 100-5*x;
+        Variables[1] = 5;
+        Variables[2] = 4;
+        Variables[3] = 5;
+        Variables[4] = 10;
+
+        return Variables;
+    }
+
+    public void setRotoide1(float newPos)
+    {
+        jointsPositions.positionRotoide1 = newPos;
+        
+    }
+    public void setPrismatic1(float newPos)
+    {
+        jointsPositions.positionPrismatic1 = newPos;
+
+    }
+    public void setRotoide2(float newPos)
+    {
+        jointsPositions.positionRotoide2 = newPos;
+
+    }
+    public void setPrismatic2(float newPos)
+    {
+        jointsPositions.positionPrismatic2 = newPos;
+
+    }
+    public void setRotoide3(float newPos)
+    {
+        jointsPositions.positionRotoide3 = newPos;
+
     }
 }

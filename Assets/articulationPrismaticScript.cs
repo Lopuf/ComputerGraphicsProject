@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class articulationPrismaticScript : MonoBehaviour
 {
-    public float moveSpeed = 0.05f;
+    private float moveSpeed = 0.2f;
 
 
     [Range(0, 12)]

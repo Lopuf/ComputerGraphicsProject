@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class articulationRotoideScript : MonoBehaviour
 {
-    public float rotationSpeed = 0.2f;
+    private float rotationSpeed = 1f;
     // Start is called before the first frame update
 
 
