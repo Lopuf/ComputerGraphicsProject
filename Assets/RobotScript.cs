@@ -11,12 +11,15 @@ public class RobotScript : MonoBehaviour
     private GameObject joint4;
     private GameObject joint5;
     private GameObject joint6;
-    private articulationPrismaticScript jointScript1;
-    private articulationRotoideScript jointScript2;
+    private articulationRotoideScript jointScript1;
+    private articulationPrismaticScript jointScript2;
     private articulationPrismaticScript jointScript3;
     private articulationRotoideScript jointScript4;
     private articulationRotoideScript jointScript5;
     private articulationRotoideScript jointScript6;
+
+    private GameObject tip;
+    private TrailRenderer trail;
 
     private bool drawLine;
     private bool drawCircle;
@@ -25,16 +28,19 @@ public class RobotScript : MonoBehaviour
     private float yDesired;
     private float zDesired;
 
+    private int iterations;
+
+    public EnsisaPath ensisaScript;
 
     [System.Serializable]
     public struct Stats
     {
         [Header("Movement Settings")]
         [Tooltip("You can change the speed and the position of each body part")]
-        [Range(0, 12)]
-        public float positionPrismatic1;
         [Range(-180, 180)]
         public float positionRotoide1;
+        [Range(0, 12)]
+        public float positionPrismatic1;
         [Range(0, 12)]
         public float positionPrismatic2;
         [Range(-180, 180)]
@@ -62,27 +68,34 @@ public class RobotScript : MonoBehaviour
         joint4 = GameObject.Find("Articulation4");
         joint5 = GameObject.Find("Articulation5");
         joint6 = GameObject.Find("Articulation6");
-        jointScript1 = joint1.GetComponent<articulationPrismaticScript>();
-        jointScript2 = joint2.GetComponent<articulationRotoideScript>();
+        jointScript1 = joint1.GetComponent<articulationRotoideScript>();
+        jointScript2 = joint2.GetComponent<articulationPrismaticScript>();
         jointScript3 = joint3.GetComponent<articulationPrismaticScript>();
         jointScript4 = joint4.GetComponent<articulationRotoideScript>();
         jointScript5 = joint5.GetComponent<articulationRotoideScript>();
         jointScript6 = joint6.GetComponent<articulationRotoideScript>();
+
+
+        tip = GameObject.Find("Tip");
+        trail = tip.GetComponent<TrailRenderer>();
+        //trail.widthMultiplier = 0f;
+        trail.emitting = false;
         drawLine = false;
         drawCircle = false;
         drawEnsisa = false;
+        iterations = 0;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (jointsPositions.positionPrismatic1 != jointScript1.distance)
+        if (jointsPositions.positionRotoide1 != jointScript1.angle)
         {
-            jointScript1.distance = jointsPositions.positionPrismatic1;
+            jointScript1.angle = jointsPositions.positionRotoide1;
         }
-        if (jointsPositions.positionRotoide1 != jointScript2.angle)
+        if (jointsPositions.positionPrismatic1 != jointScript2.distance)
         {
-            jointScript2.angle = jointsPositions.positionRotoide1;
+            jointScript2.distance = jointsPositions.positionPrismatic1;
         }
         if (jointsPositions.positionPrismatic2 != jointScript3.distance)
         {
@@ -105,17 +118,17 @@ public class RobotScript : MonoBehaviour
         {
             if(xDesired < 10)
             {
-                xDesired += 0.1f;
+                xDesired += 0.02f;
                 float[] Variables = CalculVariablesArticulaires(xDesired, yDesired, zDesired);
                 // [jointScript1.angle, jointScript2.distance, jointScript3.angle, jointScript4.distance, jointScript5.angle]
-                jointScript1.distance = Variables[0];
-                jointScript2.angle = Variables[1];
+                jointScript1.angle = Variables[0];
+                jointScript2.distance = Variables[1];
                 jointScript3.distance = Variables[2];
                 jointScript4.angle = Variables[3];
                 jointScript5.angle = Variables[4];
                 jointScript6.angle = Variables[5];
-                jointsPositions.positionPrismatic1 = Variables[0];
-                jointsPositions.positionRotoide1 = Variables[1];
+                jointsPositions.positionRotoide1 = Variables[0];
+                jointsPositions.positionPrismatic1 = Variables[1];
                 jointsPositions.positionPrismatic2 = Variables[2];
                 jointsPositions.positionRotoide2 = Variables[3];
                 jointsPositions.positionRotoide3 = Variables[4];
@@ -124,6 +137,71 @@ public class RobotScript : MonoBehaviour
             else
             {
                 drawLine = false;
+                EndDraw();
+            }
+        }
+        if (drawCircle)
+        {
+            if (iterations < 1800)
+            {
+                xDesired = Mathf.Cos(iterations/5 * Mathf.Deg2Rad) *8;
+                yDesired = Mathf.Sin(iterations/ 5 * Mathf.Deg2Rad) *8+6;
+               
+                float[] Variables = CalculVariablesArticulaires(xDesired, yDesired, zDesired);
+                // [jointScript1.angle, jointScript2.distance, jointScript3.angle, jointScript4.distance, jointScript5.angle]
+                jointScript1.angle = Variables[0];
+                jointScript2.distance = Variables[1];
+                jointScript3.distance = Variables[2];
+                jointScript4.angle = Variables[3];
+                jointScript5.angle = Variables[4];
+                jointScript6.angle = Variables[5];
+                jointsPositions.positionRotoide1 = Variables[0];
+                jointsPositions.positionPrismatic1 = Variables[1];
+                jointsPositions.positionPrismatic2 = Variables[2];
+                jointsPositions.positionRotoide2 = Variables[3];
+                jointsPositions.positionRotoide3 = Variables[4];
+                jointsPositions.positionRotoide4 = Variables[5];
+                iterations++;
+            }
+            else
+            {
+                drawCircle = false;
+                iterations = 0;
+                EndDraw();
+            }
+        }
+        if (drawEnsisa)
+        {
+            if (iterations < ensisaScript.path.Length / 3)
+            {
+                //Debug.Log(ensisaScript.path.Length); //ensisaScript.path[0,1] // ensisaScript.path.Length/3 !!
+
+                xDesired = (float)ensisaScript.path[iterations, 0];
+                yDesired = (float)ensisaScript.path[iterations, 1];
+                if (ensisaScript.path[iterations, 2] == 1) trail.emitting = true;
+                else trail.emitting = false;
+
+
+                float[] Variables = CalculVariablesArticulaires(xDesired, yDesired, zDesired);
+                // [jointScript1.angle, jointScript2.distance, jointScript3.angle, jointScript4.distance, jointScript5.angle]
+                jointScript1.angle = Variables[0];
+                jointScript2.distance = Variables[1];
+                jointScript3.distance = Variables[2];
+                jointScript4.angle = Variables[3];
+                jointScript5.angle = Variables[4];
+                jointScript6.angle = Variables[5];
+                jointsPositions.positionRotoide1 = Variables[0];
+                jointsPositions.positionPrismatic1 = Variables[1];
+                jointsPositions.positionPrismatic2 = Variables[2];
+                jointsPositions.positionRotoide2 = Variables[3];
+                jointsPositions.positionRotoide3 = Variables[4];
+                jointsPositions.positionRotoide4 = Variables[5];
+                iterations++;
+            }
+            else
+            {
+                drawEnsisa = false;
+                iterations = 0;
                 EndDraw();
             }
         }
@@ -149,14 +227,20 @@ public class RobotScript : MonoBehaviour
 
     void inPositionToDrawLine()
     {
+        //trail.widthMultiplier = 1f;
+        trail.emitting = true;
         drawLine = true;
     }
     void inPositionToDrawCircle()
     {
+        //trail.widthMultiplier = 1f;
+        trail.emitting = true;
         drawCircle = true;
     }
     void inPositionToDrawEnsisa()
     {
+        //trail.widthMultiplier = 1f;
+        trail.emitting = true;
         drawEnsisa = true;
     }
 
@@ -165,9 +249,9 @@ public class RobotScript : MonoBehaviour
         // ici on met CalculVariablesArticulaires(xDesired, yDesired, zDesired)
         xDesired = -6.5f;
         yDesired = 10.3f;
-        zDesired = -22.3f;
-        jointsPositions.positionPrismatic1 = 5;
+        zDesired = -7f;
         jointsPositions.positionRotoide1 = 100;
+        jointsPositions.positionPrismatic1 = 5;
         jointsPositions.positionPrismatic2 = 5;
         jointsPositions.positionRotoide2 = 6;
         jointsPositions.positionRotoide3 = 20;
@@ -178,29 +262,31 @@ public class RobotScript : MonoBehaviour
         // ici on met CalculVariablesArticulaires(xDesired, yDesired, zDesired)
         xDesired = -6.5f;
         yDesired = 10.3f;
-        zDesired = -22.3f;
-        jointsPositions.positionPrismatic1 = 5;
-        jointsPositions.positionRotoide1 = 100;
-        jointsPositions.positionPrismatic2 = 5;
-        jointsPositions.positionRotoide2 = 6;
-        jointsPositions.positionRotoide3 = 20;
-        jointsPositions.positionRotoide4 = 20;
+        zDesired = -7f;
+        jointsPositions.positionPrismatic1 = 0;
+        jointsPositions.positionRotoide1 = 0;
+        jointsPositions.positionPrismatic2 = 8;
+        jointsPositions.positionRotoide2 = 0;
+        jointsPositions.positionRotoide3 = 0;
+        jointsPositions.positionRotoide4 = 0;
     }
     void StartDrawEnsisa()
     {
         // ici on met CalculVariablesArticulaires(xDesired, yDesired, zDesired)
-        xDesired = -6.5f;
-        yDesired = 10.3f;
-        zDesired = -22.3f;
-        jointsPositions.positionPrismatic1 = 5;
-        jointsPositions.positionRotoide1 = 100;
-        jointsPositions.positionPrismatic2 = 5;
-        jointsPositions.positionRotoide2 = 6;
-        jointsPositions.positionRotoide3 = 20;
-        jointsPositions.positionRotoide4 = 20;
+        xDesired = 0f;
+        yDesired = 0f;
+        zDesired = 0f; //-7f
+        jointsPositions.positionPrismatic1 = 12;
+        jointsPositions.positionRotoide1 = 0;
+        jointsPositions.positionPrismatic2 = 3;
+        jointsPositions.positionRotoide2 = 0;
+        jointsPositions.positionRotoide3 = 0;
+        jointsPositions.positionRotoide4 = 0;
     }
     void EndDraw()
     {
+        //trail.widthMultiplier = 0f;
+        trail.emitting = false;
         jointsPositions.positionPrismatic1 = 0;
         jointsPositions.positionRotoide1 = 0;
         jointsPositions.positionPrismatic2 = 0;
@@ -217,9 +303,9 @@ public class RobotScript : MonoBehaviour
         // matrice de modele geometrique inverse
         float[] Variables = new float[6];
 
-        Variables[0] = 5;
-        Variables[1] = 100-5*x;
-        Variables[2] = 8;
+        Variables[0] = 0;
+        Variables[1] = y;
+        Variables[2] = 12+x;
         Variables[3] = 6;
         Variables[4] = 10;
         Variables[5] = 10;
