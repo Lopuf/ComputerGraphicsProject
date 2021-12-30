@@ -172,13 +172,13 @@ public class RobotScript : MonoBehaviour
         }
         if (drawEnsisa)
         {
-            if (iterations < ensisaScript.path.Length / 3)
+            if (iterations < ensisaScript.path.Length*4 / 3)
             {
                 //Debug.Log(ensisaScript.path.Length); //ensisaScript.path[0,1] // ensisaScript.path.Length/3 !!
 
-                xDesired = (float)ensisaScript.path[iterations, 0];
-                yDesired = (float)ensisaScript.path[iterations, 1];
-                if (ensisaScript.path[iterations, 2] == 1) trail.emitting = true;
+                xDesired = (float)ensisaScript.path[iterations/4, 0];
+                yDesired = (float)ensisaScript.path[iterations/4, 1];
+                if (ensisaScript.path[iterations/4, 2] == 1) trail.emitting = true;
                 else trail.emitting = false;
 
 
@@ -263,9 +263,9 @@ public class RobotScript : MonoBehaviour
         xDesired = -6.5f;
         yDesired = 10.3f;
         zDesired = -7f;
-        jointsPositions.positionPrismatic1 = 0;
         jointsPositions.positionRotoide1 = 0;
-        jointsPositions.positionPrismatic2 = 8;
+        jointsPositions.positionPrismatic1 = 6;
+        jointsPositions.positionPrismatic2 = 20;
         jointsPositions.positionRotoide2 = 0;
         jointsPositions.positionRotoide3 = 0;
         jointsPositions.positionRotoide4 = 0;
@@ -276,8 +276,8 @@ public class RobotScript : MonoBehaviour
         xDesired = 0f;
         yDesired = 0f;
         zDesired = 0f; //-7f
-        jointsPositions.positionPrismatic1 = 12;
         jointsPositions.positionRotoide1 = 0;
+        jointsPositions.positionPrismatic1 = 12;
         jointsPositions.positionPrismatic2 = 3;
         jointsPositions.positionRotoide2 = 0;
         jointsPositions.positionRotoide3 = 0;
