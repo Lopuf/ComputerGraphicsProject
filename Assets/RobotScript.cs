@@ -32,6 +32,7 @@ public class RobotScript : MonoBehaviour
 
     public EnsisaPath ensisaScript;
 
+
     [System.Serializable]
     public struct Stats
     {
@@ -116,7 +117,7 @@ public class RobotScript : MonoBehaviour
 
         if (drawLine)
         {
-            if(xDesired < 10)
+            if(xDesired < 15)
             {
                 xDesired += 0.02f;
                 float[] Variables = CalculVariablesArticulaires(xDesired, yDesired, zDesired);
@@ -145,7 +146,7 @@ public class RobotScript : MonoBehaviour
             if (iterations < 1800)
             {
                 xDesired = Mathf.Cos(iterations/5 * Mathf.Deg2Rad) *8;
-                yDesired = Mathf.Sin(iterations/ 5 * Mathf.Deg2Rad) *8+6;
+                yDesired = Mathf.Sin(iterations/ 5 * Mathf.Deg2Rad) *8+7;
                
                 float[] Variables = CalculVariablesArticulaires(xDesired, yDesired, zDesired);
                 // [jointScript1.angle, jointScript2.distance, jointScript3.angle, jointScript4.distance, jointScript5.angle]
@@ -183,7 +184,6 @@ public class RobotScript : MonoBehaviour
 
 
                 float[] Variables = CalculVariablesArticulaires(xDesired, yDesired, zDesired);
-                // [jointScript1.angle, jointScript2.distance, jointScript3.angle, jointScript4.distance, jointScript5.angle]
                 jointScript1.angle = Variables[0];
                 jointScript2.distance = Variables[1];
                 jointScript3.distance = Variables[2];
@@ -222,6 +222,14 @@ public class RobotScript : MonoBehaviour
         StartDrawEnsisa();
         Invoke("inPositionToDrawEnsisa", 2);
     }
+    public void Draw()
+    {
+        trail.emitting = true;
+    }
+    public void Stop()
+    {
+        trail.emitting = false;
+    }
 
 
 
@@ -247,41 +255,62 @@ public class RobotScript : MonoBehaviour
     void StartDrawLine()
     {
         // ici on met CalculVariablesArticulaires(xDesired, yDesired, zDesired)
-        xDesired = -6.5f;
-        yDesired = 10.3f;
+        xDesired = -15f;
+        yDesired = 10f;
         zDesired = -7f;
-        jointsPositions.positionRotoide1 = 100;
-        jointsPositions.positionPrismatic1 = 5;
-        jointsPositions.positionPrismatic2 = 5;
-        jointsPositions.positionRotoide2 = 6;
-        jointsPositions.positionRotoide3 = 20;
-        jointsPositions.positionRotoide4 = 20;
+        float[] Variables = CalculVariablesArticulaires(xDesired, yDesired, zDesired);
+        jointScript1.angle = Variables[0];
+        jointScript2.distance = Variables[1];
+        jointScript3.distance = Variables[2];
+        jointScript4.angle = Variables[3];
+        jointScript5.angle = Variables[4];
+        jointScript6.angle = Variables[5];
+        jointsPositions.positionRotoide1 = Variables[0];
+        jointsPositions.positionPrismatic1 = Variables[1];
+        jointsPositions.positionPrismatic2 = Variables[2];
+        jointsPositions.positionRotoide2 = Variables[3];
+        jointsPositions.positionRotoide3 = Variables[4];
+        jointsPositions.positionRotoide4 = Variables[5];
     }
     void StartDrawCircle()
     {
         // ici on met CalculVariablesArticulaires(xDesired, yDesired, zDesired)
-        xDesired = -6.5f;
-        yDesired = 10.3f;
+        xDesired = 8f;
+        yDesired = 7f;
         zDesired = -7f;
-        jointsPositions.positionRotoide1 = 0;
-        jointsPositions.positionPrismatic1 = 6;
-        jointsPositions.positionPrismatic2 = 20;
-        jointsPositions.positionRotoide2 = 0;
-        jointsPositions.positionRotoide3 = 0;
-        jointsPositions.positionRotoide4 = 0;
+        float[] Variables = CalculVariablesArticulaires(xDesired, yDesired, zDesired);
+        jointScript1.angle = Variables[0];
+        jointScript2.distance = Variables[1];
+        jointScript3.distance = Variables[2];
+        jointScript4.angle = Variables[3];
+        jointScript5.angle = Variables[4];
+        jointScript6.angle = Variables[5];
+        jointsPositions.positionRotoide1 = Variables[0];
+        jointsPositions.positionPrismatic1 = Variables[1];
+        jointsPositions.positionPrismatic2 = Variables[2];
+        jointsPositions.positionRotoide2 = Variables[3];
+        jointsPositions.positionRotoide3 = Variables[4];
+        jointsPositions.positionRotoide4 = Variables[5];
     }
     void StartDrawEnsisa()
     {
         // ici on met CalculVariablesArticulaires(xDesired, yDesired, zDesired)
-        xDesired = 0f;
-        yDesired = 0f;
-        zDesired = 0f; //-7f
-        jointsPositions.positionRotoide1 = 0;
-        jointsPositions.positionPrismatic1 = 12;
-        jointsPositions.positionPrismatic2 = 3;
-        jointsPositions.positionRotoide2 = 0;
-        jointsPositions.positionRotoide3 = 0;
-        jointsPositions.positionRotoide4 = 0;
+        xDesired = -9f;
+        yDesired = 12f;
+        zDesired = -7f; //-7f
+        float[] Variables = CalculVariablesArticulaires(xDesired, yDesired, zDesired);
+        jointScript1.angle = Variables[0];
+        jointScript2.distance = Variables[1];
+        jointScript3.distance = Variables[2];
+        jointScript4.angle = Variables[3];
+        jointScript5.angle = Variables[4];
+        jointScript6.angle = Variables[5];
+        jointsPositions.positionRotoide1 = Variables[0];
+        jointsPositions.positionPrismatic1 = Variables[1];
+        jointsPositions.positionPrismatic2 = Variables[2];
+        jointsPositions.positionRotoide2 = Variables[3];
+        jointsPositions.positionRotoide3 = Variables[4];
+        jointsPositions.positionRotoide4 = Variables[5];
     }
     void EndDraw()
     {
@@ -303,12 +332,12 @@ public class RobotScript : MonoBehaviour
         // matrice de modele geometrique inverse
         float[] Variables = new float[6];
 
-        Variables[0] = 0;
+        Variables[0] = (Mathf.Acos(x / (Mathf.Sqrt(Mathf.Pow(x, 2) + Mathf.Pow(z, 2)))) - Mathf.Acos(1/ (Mathf.Sqrt(Mathf.Pow(x, 2) + Mathf.Pow(z, 2))))) * Mathf.Rad2Deg + 90; //90 pcq mauvais axes
         Variables[1] = y;
-        Variables[2] = 12+x;
-        Variables[3] = 6;
-        Variables[4] = 10;
-        Variables[5] = 10;
+        Variables[2] = Mathf.Sqrt(Mathf.Pow(x, 2) + Mathf.Pow(z, 2) - 25);
+        Variables[3] = 0;
+        Variables[4] = 0;
+        Variables[5] = 0;
 
         return Variables;
     }
